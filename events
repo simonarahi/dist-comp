@@ -1,0 +1,9 @@
+def reformat(line):
+    total=line.split("^M")
+    return total
+
+# the returned RDD is of this format: ['industry_type, event_name, day, month, year, location, borough, lat, lng']
+file=sc.textFile("/home/simona/matching_data/events.csv")
+header=file.take(1)
+filtered=file.filter(lambda x: False if x==header[0] else True)
+eventRDD=filtered.map(reformat)
