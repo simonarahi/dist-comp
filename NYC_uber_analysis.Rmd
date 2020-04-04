@@ -1,0 +1,66 @@
+---
+title: "Untitled"
+author: "Simona Rahi"
+date: "3/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(forcats)
+```
+
+```{r}
+joined_avg_count <- read.csv("~/Desktop/joined_avg_count.csv")
+events <- read.csv("~/Desktop/matching_data/events.csv")
+```
+
+```{r}
+
+adjusted.average <- (joined_avg_count$Average - min(joined_avg_count$Average))/(max(joined_avg_count$Average)-min(joined_avg_count$Average))
+a <- cbind(joined_avg_count, adjusted.average)
+
+adjusted.count <- (joined_avg_count$count - min(joined_avg_count$count))/(max(joined_avg_count$count)-min(joined_avg_count$count))
+b <- cbind(a, adjusted.count)
+
+difference <- (adjusted.average - adjusted.count)+1
+c <- cbind(b, difference) 
+View(c)
+```
+
+```{r}
+# testing on one day
+people_climate_march <- c %>% filter(Month=='9' & Day=='21') %>% arrange(desc(difference)) %>% select(-Latitude.1, -Longitude.1, -X)
+View(people_climate_march)
+
+```
+
+
+
+```{r}
+# function that returns the dataframe for a specified day/month
+events_fct <- function(df, month, day){
+  df1 <- df %>% filter(Month==month & Day==day) %>% arrange(desc(difference)) %>% select(-Latitude.1, -Longitude.1, -X)
+  return(df1)
+}
+
+df <- events_fct(c, 7, 4)
+write.csv(df,"/Users/simonarahi/Desktop/events_csv/4th_macy_fireworks.csv", row.names = FALSE)
+```
+
+
+```{r}
+events1 <- events %>% filter(year=='2014')
+View(events1)
+```
+
+```{r}
+# function on fourth of july
+yankee <- events_fct(joined_avg_count, 5, 26)
+View(yankee)
+```
+
