@@ -1,4 +1,5 @@
+import pandas as pd
 import plotly.express as px
-df = pd.read_csv('/home/simona/events_csvs/yankee_opening.csv')
-fig=px.density_mapbox(df, lat='Latitude', lon='Longitude', z='Average', radius=10, center=dict(lat=0, lon=180), zoom=0, mapbox_style="stamen-terrain")
-fig.write_html("/home/simona/yankee_map1.html")
+df = pd.read_csv('/home/simona/events_csv/yankee_opening.csv')
+fig=px.density_mapbox(df, lat='Latitude', lon='Longitude', z='difference', radius=10, center=dict(lat=40.730, lon=-73.935), zoom=10, mapbox_style="stamen-terrain")
+fig.write_html("/home/simona/maps/yankee_opening.html")
