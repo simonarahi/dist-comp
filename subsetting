@@ -1,0 +1,4 @@
+df=spark.read.csv('/home/simona/ubers.csv', header=True, inferSchema=True)
+df.createOrReplaceTempView("yankee")
+new_df = sqlContext.sql("select * from yankee where Month=4 and Day=7")
+new_df.toPandas().to_csv('/home/simona/new_df')
