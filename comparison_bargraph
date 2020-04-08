@@ -1,5 +1,6 @@
 df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv')
-df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv', header=True, inderSchema=True)
+df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv', header=True, inferSchema=True)
+** add line on referencing name **
 kp_concert = sqlContext.sql("select * from kp where Longitudeb BETWEEN -73.99 and -73.95 and Latitudeb BETWEEN 40.66 and 40.70")
 kp_concert.toPandas().to_csv('/home/simona/kp.csv')
 kp=pd.read_csv('/home/simona/kp.csv')
@@ -7,10 +8,10 @@ kp=pd.read_csv('/home/simona/kp.csv')
 import plotly.graph_objects as go
 import pandas as pd
 
-time=kp['Hourb']
 fig=go.Figure()
+time=kp['Hourb']
 fig.add_trace(go.Bar(x=time, y=kp['Average'], name='Average', marker_color='indianred'))
 fig.add_trace(go.Bar(x=time, y=kp['Count'], name='Count', marker_color='lightsalmon'))
-fig.update_layout(barmode='group', title_text = 'Katy Perry Concert')
+fig.update_layout(barmode='group', title_text = 'Katy Perry Concert on July 24', xaxis_title="Hour")
 
-fig.write_html("/home/simona/kp.html")
+fig.write_html("/home/simona/charts/katy_perry.html")
