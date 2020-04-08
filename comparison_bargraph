@@ -1,6 +1,6 @@
 df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv')
 df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv', header=True, inferSchema=True)
-** add line on referencing name **
+df.createOrReplaceTempView("kp")
 kp_concert = sqlContext.sql("select * from kp where Longitudeb BETWEEN -73.99 and -73.95 and Latitudeb BETWEEN 40.66 and 40.70")
 kp_concert.toPandas().to_csv('/home/simona/kp.csv')
 kp=pd.read_csv('/home/simona/kp.csv')
