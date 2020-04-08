@@ -1,17 +1,73 @@
-df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv')
-df=spark.read.csv('/home/simona/events2/katy_perry_concert.csv', header=True, inferSchema=True)
-df.createOrReplaceTempView("kp")
-kp_concert = sqlContext.sql("select * from kp where Longitudeb BETWEEN -73.99 and -73.95 and Latitudeb BETWEEN 40.66 and 40.70")
-kp_concert.toPandas().to_csv('/home/simona/kp.csv')
-kp=pd.read_csv('/home/simona/kp.csv')
+df=spark.read.csv('/home/simona/events2/climate_march.csv', header=True, inferSchema=True)
+df.createOrReplaceTempView("march")
+march = sqlContext.sql("select * from march where Longitudeb BETWEEN -73.99 and -73.95 and Latitudeb BETWEEN 40.74 and 40.78")
+march.toPandas().to_csv('/home/simona/barchart_csv/climate_march.csv')
 
 import plotly.graph_objects as go
 import pandas as pd
 
+#cher concert
+df=pd.read_csv("/home/simona/barchart_csv/cher_concert.csv")
 fig=go.Figure()
-time=kp['Hourb']
-fig.add_trace(go.Bar(x=time, y=kp['Average'], name='Average', marker_color='indianred'))
-fig.add_trace(go.Bar(x=time, y=kp['Count'], name='Count', marker_color='lightsalmon'))
-fig.update_layout(barmode='group', title_text = 'Katy Perry Concert on July 24', xaxis_title="Hour")
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "Cher Concert, Dressed To Kill Tour", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/cher_concert.html')
 
-fig.write_html("/home/simona/charts/katy_perry.html")
+
+#US open tennis
+df=pd.read_csv("/home/simona/barchart_csv/US_open_tennis.csv")
+fig=go.Figure()
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "2014 US Open - Tennis", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/US_open_tennis.html')
+
+#climate march
+df=pd.read_csv("/home/simona/barchart_csv/climate_march.csv")
+fig=go.Figure()
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "People's Climate March", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/climate_march.html')
+
+#katy perry concert
+df=pd.read_csv("/home/simona/barchart_csv/katy_perry_concert.csv")
+fig=go.Figure()
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "Katy Perry Concert - The Prismatic World Tour", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/katy_perry_concert.html')
+
+
+#enrique concert
+df=pd.read_csv("/home/simona/barchart_csv/enrique_concert.csv")
+fig=go.Figure()
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "Enrique Iglesias Concert - Sex and Love Tour", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/enrique_concert.html')
+
+#memorial day
+df=pd.read_csv("/home/simona/barchart_csv/memorial_day.csv")
+fig=go.Figure()
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "Memorial Day - Coney Island", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/memorial_day.html')
+
+#yankee opening
+df=pd.read_csv("/home/simona/barchart_csv/yankee.csv")
+fig=go.Figure()
+time=df['Hourb']
+fig.add_trace(go.Bar(x=time, y=df['Average'], name='Average', marker_color='indianred'))
+fig.add_trace(go.Bar(x=time, y=df['Count'], name='Count', marker_color='lightsalmon'))
+fig.update_layout(barmode='group', title_text = "Yankee Opening Game", xaxis_title="Hour")
+fig.write_html('/home/simona/charts/yankee.html')
+
