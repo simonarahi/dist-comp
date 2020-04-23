@@ -1,0 +1,136 @@
+'''
+Author: Justin Tienken-Harder
+​
+Purpose of this file is to provide a function that cleans the Faceboook Data provided in the 2020 Spring Semester, Distributed Computing Class
+​
+'''
+​
+​
+​
+import numpy as np
+​
+​
+def listerine(string):
+  def process_images(string, removable = ["[", ']', "}", '{', '"'], image = True):
+    reform = string.split(",")
+    if image:
+      outta_here = {x.replace("{", "").replace("}", "").replace('"', "") for x in reform}
+      return outta_here
+    else:
+      for i in removable:
+        reform = [x.remove(i,"") for x in reform]
+      reform.remove("")
+      return reform
+  def forward(array, ending_substring, image = True, remove = True):
+    stringy = ""
+    try:
+        while ending_substring not in first[0]:
+          stringy += ',' + array.pop(0)
+        stringy += ',' + array.pop(0)
+    except IndexError:
+        return "", array
+    #while ending_substring not in first[0]:
+    #  stringy += ',' + array.pop(0)
+    #stringy += ',' + array.pop(0)
+    if remove:
+      set_out = process_images(stringy)
+      return set_out, array
+    else:
+      return stringy[1:], array
+  #Start of the program
+  output = []
+  first = string.split(",")
+  output.append(first.pop(0)) # Post Identifier
+  def check_int(element):     # Remove HTML stuff
+    try:
+      int(element)
+      return True
+    except:
+      return False
+  try:
+      while not check_int(first[0]):
+      # Keep popping off elements until we get to something that isn't a string in HTML
+        first.pop(0)
+  except IndexError:
+      return (len(output), 1)
+  output.append(first.pop(0))  # Political
+  output.append(first.pop(0))  # not_political
+  #Here we get to dealing with titles
+  stringy = ""
+  try:
+      while "<p>" not in first[1]:
+        stringy += first.pop(0)
+      stringy += first.pop(0)
+  except IndexError:
+      return (len(output), 1)
+  output.append(stringy)  #These are the titles
+  #now we start working on the message
+  #define two functions
+  def remaining_paragraphs_count(array):
+    stuff = np.array([1 if "</p>" in x else 0 for x in array])
+    #print(stuff)
+    count = np.sum(stuff)
+    return count
+  # start working our way through garbage
+  count = 0
+  stringy = ""
+  how_far_weve_come = remaining_paragraphs_count(first)
+  while count != how_far_weve_come:
+    if "</p>" in first[0]:
+      count += 1
+    stringy += first.pop(0)
+  output.append(stringy) #append the whole message
+  output.extend(first[0:4]) #append thumbnail, creation time, updated time, and language
+  first = first[4:] #Let's work on images
+  set_out, first = forward(first, "}")
+  if set_out == "":
+    return (len(output), 1)
+  set_out.remove("")
+  output.append(set_out) #set of images associated with this entry
+  output.extend(first[0:4])
+  first = first[4:]
+  #now we have to work on targets
+  targets, first = forward(first, "]", remove = False)
+  if targets == "":
+    return (len(output), 1)
+  output.append(targets)
+  output.append(first.pop(0)) #append advertiserr field
+  #now work on entities:
+  entities, first = forward(first, "]", remove = False)
+  if entities == "":
+    return (len(output), 1)
+  output.append(entities)
+  output.extend(first[0:3]) #append page, lower_page, targetings
+  #work on paid for by by ignoring it
+  listbuilding_fundraising = first.pop()
+  targetedness = first.pop()
+  stringy = ""
+  for i in first:
+    stringy += "," + i
+  paid_for_by = stringy[1:]
+  output.append(paid_for_by)
+  output.append(targetedness)
+  output.append(listbuilding_fundraising)
+  return (len(output),1)
+​
+​
+​
+first = sc.textFile("/usr/data/facebook/fbpac-ads-en-US.csv")
+header = first.take(1)
+first = first.filter(lambda x: False if x == header[0] else True)
+second = first.map(listerine)
+third = second.reduceByKey(lambda x, y: x+y)
+third = second.reduceByKey(sum)
+third.take(1)
+​
+third = second.reduceByKey(lambda x,y: x+y)
+thingy = '''hyperfeed_story_id_5c9bb2a2413852086735771,"<div class=""_5pa- userContentWrapper""><div class=""_1dwg _1w_m""><div><div class=""c_j6_8v625z u_j6_8vckru clearfix""><div class=""clearfix l_j6_8v610s""><a class=""_5pb8 f_j6_8vckr_ _8o _8s lfloat _ohe"" data-hovercard=""https://www.facebook.com/197760674021143"" href=""https://www.facebook.com/indivisibleguide/""><div class=""_38vo""><!-- react-mount-point-unstable --><div><img class=""_s0 _4ooo _5xib _44ma _54ru img"" src=""https://pp-facebook-ads.s3.amazonaws.com/v/t1.0-1/p130x130/37121548_451984051932136_7541493776095641600_n.jpg""></div></div></a><div class=""clearfix _42ef""><div class=""rfloat _ohf""></div><div class=""m_j6_8v610z""><div><div class=""_6a _5u5j""><div class=""_6a _6b""></div><div class=""_6a _5u5j _6b""><h6 class=""_14f3 _14f5 _5pbw _5vra""><span class=""fwn fcg""><span class=""fwb fcg""><a data-hovercard=""https://www.facebook.com/197760674021143"" href=""https://www.facebook.com/indivisibleguide/"">Indivisible Guide</a></span></span></h6><div><a class=""_5pcq"" href=""#"" id=""u_fetchstream_8_4""><span><span class=""_3nlk"">Sponsored</span> ⋅ Paid for by <span class=""_3nlk"">Indivisible Project</span></span></a><span class=""_6spk""> · </span><a class=""uiStreamPrivacy inlineBlock fbStreamPrivacy fbPrivacyAudienceIndicator _5pcq"" href=""#""><i class=""lock img sp__EFZWPnvn_g_2x sx_7cdd39""></i></a></div></div></div></div></div></div></div></div><div class=""_5pbx userContent _3576"" id=""js_3ei""><p>The Mueller investigation is over. Special Counsel Robert Mueller has delivered his findings to Attorney General Barr, and now Barr must disclose those findings to Congress. Indivisible is demanding that these findings be made public, and we fully support the congressional investigations that are still pending.</p><p> If you agree, join Indivisible today and urge Congress to release the report. Add your name to the growing list of Americans who are demanding full transparency and accountability in this matter.</p></div><div class=""_3x-2""><div><div class=""mtm""><div class=""_1ci8""><div class=""_6m2 _1zpr clearfix _dcs _4_w4 _59ap _2bf7 _64lx _3eqz _20pq _3eqw _2rk1 _3n1j _5qqr"" id=""u_fetchstream_8_5""><div class=""clearfix _2r3x""><div class=""lfloat _ohe""><span class=""_3m6-""><div class=""_6ks""><a href=""https://act.indivisible.org/signup/acq-ads-ms-mueller/""><div class=""_6l- __c_""><div class=""uiScaledImageContainer _6m5 fbStoryAttachmentImage""><img class=""scaledImageFitWidth img"" src=""https://pp-facebook-ads.s3.amazonaws.com/v/t45.1600-4/cp0/q90/spS444/p180x540/55863114_23843220221260433_8886009863356809216_n.png.jpg""></div></div></a></div><div class=""_3ekx _29_4""><div class=""_6m3 _--6""><div class=""_59tj _2iau""><div><div class=""_6lz _6mb _1t62 ellipsis"">indivisible.org</div><div class=""""></div></div></div><div class=""_3n1k""><div class=""mbs _6m6 _2cnj _5s6c""><a href=""https://act.indivisible.org/signup/acq-ads-ms-mueller/"">Tell Congress: Release the Report</a></div><div class=""_6m7 _3bt9"">Demand that Congress be fully transparent and hold the Trump administration accountable.</div></div></div><a class=""_52c6"" href=""https://act.indivisible.org/signup/acq-ads-ms-mueller/""></a></div></span></div><div class=""_42ef""><span class=""_3c21""></span></div></div></div><div class=""_4hk3""><div class=""_34js _1kaa _34jv"" id=""u_fetchstream_8_b""><div class=""_34jx _2cpc _34ju""><div class=""_34k0""><i class=""_34k2""></i></div><div class=""_34k3"">Paid for by Indivisible P...</div><a class=""_34k6"" href=""#"" id=""u_fetchstream_8_c""></a></div><div class=""_34jw""></div></div><div class=""_1dp8""></div></div></div></div></div></div><div></div></div></div><div></div></div>",0,0,Indivisible, Guide,"<p>The Mueller investigation is over. Special Counsel Robert Mueller has delivered his findings to Attorney General Barr, and now Barr must disclose those findings to Congress. Indivisible is demanding that these findings be made public, and we fully support the congressional investigations that are still pending.</p><p> If you agree, join Indivisible today and urge Congress to release the report. Add your name to the growing list of Americans who are demanding full transparency and accountability in this matter.</p>",https://pp-facebook-ads.s3.amazonaws.com/v/t1.0-1/p130x130/37121548_451984051932136_7541493776095641600_n.jpg,2019-03-27 17:28:14.096849+00,2019-03-27 17:28:14.096849+00,en-US,{https://pp-facebook-ads.s3.amazonaws.com/v/t45.1600-4/cp0/q90/spS444/p180x540/55863114_23843220221260433_8886009863356809216_n.png.jpg},1,0.999997313088443,,f,[],,"[{""entity"": ""Americans"", ""entity_type"": ""Group""}, {""entity"": ""Special Counsel"", ""entity_type"": ""Person""}, {""entity"": ""Congress"", ""entity_type"": ""Organization""}, {""entity"": ""Mueller"", ""entity_type"": ""Organization""}, {""entity"": ""Robert Mueller"", ""entity_type"": ""Person""}, {""entity"": ""Barr"", ""entity_type"": ""Person""}]",https://www.facebook.com/indivisibleguide/,https://www.facebook.com/indivisibleguide/,,Indivisible Project,,0.350634939968586 '''
+​
+​
+wow = [(1, 2073), (3, 8217), (9, 18), (13, 1), (14, 691), (16, 3484), (23, 150115)]
+​
+​
+zam = listerine(thingy)
+for x in zam:
+  print(x)
+print(len(zam))
