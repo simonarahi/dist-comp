@@ -111,7 +111,7 @@ def listerine(string):
   output.append(paid_for_by)
   output.append(targetedness)
   output.append(listbuilding_fundraising)
-  return (len(output),1)
+  return output
 ​
 ​
 ​
