@@ -1,0 +1,3 @@
+import pyspark.sql.functions as F
+
+df.select('targetedness').withColumn('isNull_targetedness',F.col('targetedness').isNull()).where('isNull_targetedness = True').count()
