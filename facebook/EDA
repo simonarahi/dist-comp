@@ -1,4 +1,8 @@
 df = spark.read.csv("/spring2020/data/fbpac-ads-en-US.csv", inferSchema = True, header = True, quote = "\"", escape = "\"")
 
+# getting number of nulls for one specific column
 import pyspark.sql.functions as F
 df.select('targetedness').withColumn('isNull_targetedness',F.col('targetedness').isNull()).where('isNull_targetedness = True').count()
+
+#getting NaN and Null values for each column
+df_orders.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in df_orders.columns]).show()
