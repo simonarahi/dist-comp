@@ -1,4 +1,4 @@
-df = spark.read.csv("new.csv", inferSchema = True, header = True, quote = "\"", escape = "\"")
+df = spark.read.csv("/spring2020/data/fbpac-ads-en-US.csv", inferSchema = True, header = True, quote = "\"", escape = "\"")
 
 import pyspark.sql.functions as F
 df.select('targetedness').withColumn('isNull_targetedness',F.col('targetedness').isNull()).where('isNull_targetedness = True').count()
