@@ -6,3 +6,8 @@ df.select('targetedness').withColumn('isNull_targetedness',F.col('targetedness')
 
 #getting NaN and Null values for each column
 df_orders.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in df_orders.columns]).show()
+
+# changing types from string to relevant type
+from pyspark.sql.types import *
+df = df.withColumn("political1", df["targetedness"].cast(FloatType())).drop("targetedness").withColumnRenamed("political1", "targetedness")
+ 
