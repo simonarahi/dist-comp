@@ -11,4 +11,25 @@ df_orders.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in d
 from pyspark.sql.types import *
 df = df.withColumn("political1", df["targetedness"].cast(FloatType())).drop("targetedness").withColumnRenamed("political1", "targetedness")
  
+# getting dates in right format
+def clean(row):
+ if type(row[5])!=type(None):
+  cleaned = row[5][:10]
+  x = (cleaned, 1)
+  return x
+ 
+d= rdd.map(clean)
 
+def sum(x,y):
+  return x+y
+  
+# filter the None fields 
+d1=d.filter(lambda x: x is not None)
+
+# get counts by date
+d2=d1.reduceByKey(sum)
+# get which date had the most ads created at
+d2.max(lambda x:x[1])
+[out]: ('2018-11-06', 1740)
+# sorting 
+sorts = d2.sortBy(lambda x:x[1], ascending=False)
