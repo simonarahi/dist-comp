@@ -33,3 +33,12 @@ d2.max(lambda x:x[1])
 [out]: ('2018-11-06', 1740)
 # sorting 
 sorts = d2.sortBy(lambda x:x[1], ascending=False)
+
+def cleaner(row):
+   for field in range(len(row)):
+     if type(row[field])!=type(None):
+        return True
+     else:
+        return False
+
+(['id', 'political', 'not_political', 'title', 'message', 'created_at', 'updated_at', 'lang', 'impressions', 'political_probability', 'suppressed', 'targets', 'advertiser', 'entities', 'paid_for_by', 'targetedness'])
