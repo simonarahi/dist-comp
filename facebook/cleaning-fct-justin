@@ -6,7 +6,7 @@ import datetime
 from datetime import date
 ​
 ​
-def build_data(drop = ["html", 'targetings', 'targeting', 'targetedness', "thumbnail", "page", 'lower_page', 'listbuilding_fundraising_proba']):
+def build_data(drop = ["html", "images", 'targetings', 'targeting', "thumbnail", "page", 'lower_page', 'listbuilding_fundraising_proba']):
     '''
     Does preprocessing on the data and returns the "cleaned" dataframe. You can add any headers that you might want to drop.
 ​
