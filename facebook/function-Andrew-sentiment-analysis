@@ -1,0 +1,137 @@
+Author: Andrew Reilly
+#On DSGPU05, make sure to install this package if it has not already been installed:
+#pip install nltk
+
+import nltk
+#we will also need the 'punkt' resource, download IN PYSPARK with this command:
+#nltk.download('punkt')
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+
+
+def sentimentvec(ad):
+    #defining the word stemmer
+    porter = PorterStemmer()
+    #defining the sets of words to check - stop words are not included in the final analysis
+    stopwords = set(['a','an','and','are','as','at','be','by','for','from','has',
+                 'he','in','is','it','its','of','on','that','the','to','was',
+                 'were','will','with', '.',',','!','?',':',';','/'])
+    joyset=set(['play', 'cherish', 'seduc', 'enthusiast', 'tender', 'luck', 'joy', 'ecstat',
+        'triumph', 'jubil', 'elat', 'euphoria', 'nurtur', 'vibrant', 'cheer', 'magic',
+        'seren', 'lucki', 'exhilar', 'bliss', 'seduct', 'gleeful', 'love', 'zippi', 'glee',
+        'energet', 'euphor', 'happi', 'delight', 'trimphant', 'devot', 'gloriou', 'loveabl',
+        'overjoy'])
+    trustset=set(['certain', 'safe', 'authorit', 'secur', 'stabl', 'reliabl', 'saint', 'trustworthi',
+          'absolut', 'genuin', 'faith', 'scientif', 'research', 'guarente', 'accur', 'truth',
+          'trust', 'fact', 'author', 'authent', 'admir', 'scienc', 'honest', 'proven',
+          'factual', 'confidenti'])
+    fearset=set(['despair', 'horror', 'panicki', 'distress', 'fail', 'despar', 'terror', 'steal',
+         'stolen', 'pussyfoot', 'appal', 'anxiou', 'sabotag', 'anxieti', 'miser', 'failur',
+         'alarm', 'horrifi', 'frighten', 'panic', 'hostil', 'stress', 'ban', 'threaten',
+         'uncertain', 'plunder', 'threat', 'petrifi', 'wreck', 'intimid', 'paralyz', 'abus',
+         'terrifi', 'tens','hurt'])
+    supriseset=set(['astonish', 'spellbind', 'spectular', 'bewitch', 'unbeliev', 'controversi', 'awe',
+           'enchant', 'terrif', 'stun', 'startl', 'hidden', 'shock', 'remark', 'bugil',
+           'speechless', 'mesmer'])
+    sadset=set(['despair', 'bleak', 'gloomi', 'hopeless', 'lovesick', 'auster', 'weep', 'shame',
+        'resent', 'grim', 'woe', 'despond', 'tear', 'dismal', 'troubl', 'grief', 'envi',
+        'heartbroken', 'sob', 'worri', 'griev', 'woeful', 'empti', 'barren', 'aw', 'deject',
+        'enviou', 'depress', 'desol','reject'])
+    disgustset=set(['trashi', 'broken', 'shitti', 'inferior', 'crappi', 'indecis', 'repuls',
+            'blemish', 'outrag', 'icki', 'worthless', 'junk', 'crap', 'scuzzi', 'useless',
+            'embarass', 'trash', 'nasti', 'feebl', 'shit', 'dishonest', 'ridicul',
+            'cowardli', 'deplor', 'powerless', 'lousi', 'repel', 'vulgar', 'obscen', 'flaw',
+            'whip', 'invalid', 'impot', 'helpless'])
+    angerset=set(['enrag', 'hyster', 'infuri', 'damag', 'veng', 'outrag', 'hate', 'furi', 'sulk',
+          'violent', 'bitter', 'poison', 'grumpi', 'frantic', 'furiou', 'frenzi', 'explod',
+          'aggress', 'fume', 'heat', 'atroci', 'provok', 'seeth', 'panic', 'rage', 'vindict',
+          'tantrum', 'incens', 'hatr', 'irrit', 'annoy', 'venom'])
+    anticiset=set(['forbidden', 'crave', 'lust', 'motiv', 'enthus', 'passion', 'discoveri', 'yearn',
+           'eager', 'enthusiam', 'woo', 'secret', 'inspir', 'charm', 'discov', 'long', 'sensat',
+           'forgotten', 'mysteri'])
+    #initializing variables
+    joy=0
+    tru=0
+    fea=0
+    sup=0
+    sad=0
+    dis=0
+    ang=0
+    ant=0
+    totwords=0
+    error='none'
+    errorflag=False
+    #checking the ad's text and writing to output vector
+    #errors occur when there is no data in either the title or message
+    try:
+        title=word_tokenize(ad[3])
+        for item in title:
+            word = str(item)
+            word = word.lower()
+            if word not in stopwords:
+                word = porter.stem(word)
+                totwords += 1
+                if word in joyset:
+                    joy += 1
+                if word in trustset:
+                    tru += 1
+                if word in fearset:
+                    fea += 1
+                if word in supriseset:
+                    sup += 1
+                if word in sadset:
+                    sad += 1
+                if word in disgustset:
+                    dis += 1
+                if word in angerset:
+                    ang += 1
+                if word in anticiset:
+                    ant += 1
+    except Exception as e:
+        errorflag=True
+        error = e
+    try:
+        message=word_tokenize(ad[4])
+        for item in message:
+            word = str(item)
+            word = word.lower()
+            if word not in stopwords:
+                word = porter.stem(word)
+                totwords += 1
+                if word in joyset:
+                    joy += 1
+                if word in trustset:
+                    tru += 1
+                if word in fearset:
+                    fea += 1
+                if word in supriseset:
+                    sup += 1
+                if word in sadset:
+                    sad += 1
+                if word in disgustset:
+                    dis += 1
+                if word in angerset:
+                    ang += 1
+                if word in anticiset:
+                    ant += 1
+    except Exception as e:
+        errorflag=True
+        error = e
+    if errorflag == False:
+        emovec=str(joy)+','+str(tru)+','+str(fea)+','+str(sup)+','+str(sad)+','+str(dis)+','+str(ang)+','+str(ant)+','+str(totwords)
+    if errorflag == True:
+        emovec=error
+    return (ad[0],ad[1],ad[2],emovec,ad[5],ad[6],ad[7],ad[8],ad[9],ad[10],ad[11],ad[12],ad[13],ad[14],ad[15])
+    #emotional vector output: [(Number of)Joy words,Trust,Fear,Suprise,Sad,Disgust,Anger,Anticipation,Number of Words]
+
+
+
+'''
+pyspark commands:
+data,index = build_data()
+newdata = data.map(sentimentvec)
+
+to use these more effectively in regular python, separate out the string into a list by:
+    string.split(',')
+which will return the numbers in a list.
+'''
