@@ -42,3 +42,8 @@ def cleaner(row):
         return False
 
 (['id', 'political', 'not_political', 'title', 'message', 'created_at', 'updated_at', 'lang', 'impressions', 'political_probability', 'suppressed', 'targets', 'advertiser', 'entities', 'paid_for_by', 'targetedness'])
+
+# EDA on sentiment analysis
+def counter(row):
+ x=row[8]
+ return x
