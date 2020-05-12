@@ -1,10 +1,17 @@
-Author: Andrew Reilly
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May  4 20:39:46 2020
+​
+@author: Andrew
+"""
 #On DSGPU05, make sure to install this package if it has not already been installed:
 #pip install nltk
 
-import nltk
 #we will also need the 'punkt' resource, download IN PYSPARK with this command:
 #nltk.download('punkt')
+
+import nltk
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 
@@ -58,7 +65,8 @@ def sentimentvec(ad):
     dis=0
     ang=0
     ant=0
-    totwords=0
+    titwords=0
+    messwords=0
     error='none'
     errorflag=False
     #checking the ad's text and writing to output vector
@@ -70,7 +78,7 @@ def sentimentvec(ad):
             word = word.lower()
             if word not in stopwords:
                 word = porter.stem(word)
-                totwords += 1
+                titwords += 1
                 if word in joyset:
                     joy += 1
                 if word in trustset:
@@ -97,7 +105,7 @@ def sentimentvec(ad):
             word = word.lower()
             if word not in stopwords:
                 word = porter.stem(word)
-                totwords += 1
+                messwords += 1
                 if word in joyset:
                     joy += 1
                 if word in trustset:
@@ -117,21 +125,47 @@ def sentimentvec(ad):
     except Exception as e:
         errorflag=True
         error = e
-    if errorflag == False:
-        emovec=str(joy)+','+str(tru)+','+str(fea)+','+str(sup)+','+str(sad)+','+str(dis)+','+str(ang)+','+str(ant)+','+str(totwords)
+    # If there was an error with either the execution or the message not existing,
+    # it will return "error" and -1 for the wordcount
     if errorflag == True:
-        emovec=error
-    return (ad[0],ad[1],ad[2],emovec,ad[5],ad[6],ad[7],ad[8],ad[9],ad[10],ad[11],ad[12],ad[13],ad[14],ad[15])
-    #emotional vector output: [(Number of)Joy words,Trust,Fear,Suprise,Sad,Disgust,Anger,Anticipation,Number of Words]
-
-
+        emovec = "error"
+        wordcount = -1
+    if messwords == 0:
+        emovec = str(joy)+','+str(tru)+','+str(fea)+','+str(sup)+','+str(sad)+','+str(dis)+','+str(ang)+','+str(ant)
+        wordcount = -1
+    else:
+        emovec = str(joy)+','+str(tru)+','+str(fea)+','+str(sup)+','+str(sad)+','+str(dis)+','+str(ang)+','+str(ant)
+        wordcount = titwords + messwords
+    return (ad[0],ad[1],ad[2],emovec,wordcount,ad[5],ad[6],ad[7],ad[8],ad[9],ad[10],ad[11],ad[12],ad[13],ad[14],ad[15])
+    #emotional vector output: [(Number of)Joy words,Trust,Fear,Suprise,Sad,Disgust,Anger,Anticipation]
+    #wordcount: Number of Words in both message and title
 
 '''
 pyspark commands:
-data,index = build_data()
-newdata = data.map(sentimentvec)
+    data,index = build_data()
+    newdata = data.map(sentimentvec)
+
+filter commands (removes both errors in the emotion mapping)
+    newdata = newdata.filter(lambda x: x[4] != -1)
+
+test(visualize only the data this makes):
+    testdata = data.map(lambda x: [x[3],x[4]])
 
 to use these more effectively in regular python, separate out the string into a list by:
     string.split(',')
 which will return the numbers in a list.
+'''
+
+
+
+'''
+#To get word counts:
+wordmap = newdata.map(lambda x: [str(x[4]),1])
+wordmap = wordmap.reduceByKey(lambda x,k: x+k)
+
+wcDF=sqlContext.createDataFrame(wordmap, ['AdWords','Count'])
+
+#writing out csv for use later (maybe plotting?)
+#wcDF.toPandas().to_csv('/home/areilly/adwordcounts.csv')
+#scp areilly@dsgpu05.network.ncf.edu:/home/areilly/adwordcounts.csv /Users/andrew/Desktop
 '''
