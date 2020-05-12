@@ -49,10 +49,9 @@ def counter(row):
  return x
  
  # Returning RDD with emotional vector and political probability
- def mapper(row):
+def mapper(row):
   if type(row[9])== float:
-  x=row[3].split(',')
-  y=(x,row[9])
+  y=(row[3],row[9])
   return y
  
  pol = newdata.map(mapper)
