@@ -66,3 +66,7 @@ def political(row):
  # writing dataframe to single csv
  df.coalesce(1).write.option("header", "true").csv("sample_file.csv")
  
+['id', 'political', 'not_political', 'emotion', 'wordcount', 'created_at', 'updated_at', 'lang', 'impressions', 'political_probability', 'suppressed', 'targets', 'advertiser', 'entities', 'paid_for_by', 'targetedness']
+
+
+
